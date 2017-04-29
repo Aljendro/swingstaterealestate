@@ -25,4 +25,7 @@
       :summary "Returns county voting results for US 2016 election"
       :return [Result]
       :query-params [state :- s/Str]
-      (ok (data/query-data state)))))
+      (-> (ok (data/query-data state))
+        (assoc-in [:headers "Access-Control-Allow-Origin"]  "*")
+        (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,PUT,POST,DELETE,OPTIONS")
+        (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))))
