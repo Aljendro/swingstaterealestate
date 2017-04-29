@@ -25,7 +25,9 @@
                  [ring-webjars "0.1.1"]
                  [ring/ring-core "1.6.0-RC3"]
                  [ring/ring-defaults "0.2.3"]
-                 [selmer "1.10.7"]]
+                 [selmer "1.10.7"]
+                 ;; Read csv files
+                 [org.clojure/data.csv "0.1.3"]]
 
   :min-lein-version "2.0.0"
 
@@ -52,9 +54,10 @@
    :project/dev  {:dependencies [[prone "1.1.4"]
                                  [ring/ring-mock "0.3.0"]
                                  [ring/ring-devel "1.5.1"]
-                                 [pjstadig/humane-test-output "0.8.1"]]
+                                 [pjstadig/humane-test-output "0.8.1"]
+                                 [proto-repl "0.3.1"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.19.0"]]
-                  
+
                   :source-paths ["env/dev/clj"]
                   :resource-paths ["env/dev/resources"]
                   :repl-options {:init-ns user}

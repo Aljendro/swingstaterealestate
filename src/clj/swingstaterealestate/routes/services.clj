@@ -3,15 +3,31 @@
             [compojure.api.sweet :refer :all]
             [schema.core :as s]))
 
+
+(defschema Result
+  {(s/optional-key :id) s/Int
+   (s/optional-key :votes) double
+   (s/optional-key :votes_dem) double
+   (s/optional-key :votes_gop) double
+   (s/optional-key :total_votes) double
+   (s/optional-key :per_dem) double
+   (s/optional-key :per_gop) double
+   (s/optional-key :diff) double
+   (s/optional-key :per_point_diff) s/Str
+   (s/optional-key :state) s/Str
+   (s/optional-key :county_name) s/Str
+   (s/optional-key :combined_fips) s/Str})
+
+
 (defapi service-routes
   {:swagger {:ui "/swagger-ui"
              :spec "/swagger.json"
              :data {:info {:version "1.0.0"
                            :title "Sample API"
                            :description "Sample Services"}}}}
-  
+
   (context "/api" []
-    :tags ["thingie"]
+    :tags ["api" "real estate" "swing states"]
 
     (GET "/plus" []
       :return       Long
@@ -19,26 +35,5 @@
       :summary      "x+y with query-parameters. y defaults to 1."
       (ok (+ x y)))
 
-    (POST "/minus" []
-      :return      Long
-      :body-params [x :- Long, y :- Long]
-      :summary     "x-y with body-parameters."
-      (ok (- x y)))
-
-    (GET "/times/:x/:y" []
-      :return      Long
-      :path-params [x :- Long, y :- Long]
-      :summary     "x*y with path-parameters"
-      (ok (* x y)))
-
-    (POST "/divide" []
-      :return      Double
-      :form-params [x :- Long, y :- Long]
-      :summary     "x/y with form-parameters"
-      (ok (/ x y)))
-
-    (GET "/power" []
-      :return      Long
-      :header-params [x :- Long, y :- Long]
-      :summary     "x^y with header-parameters"
-      (ok (long (Math/pow x y))))))
+    (GET "/results" []
+      :return)))
