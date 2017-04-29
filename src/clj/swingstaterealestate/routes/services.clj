@@ -1,5 +1,6 @@
 (ns swingstaterealestate.routes.services
   (:require [swingstaterealestate.services.manipulate-data :as data]
+            [swingstaterealestate.services.mls-scraper :as scraper]
             [ring.util.http-response :refer :all]
             [compojure.api.sweet :refer :all]
             [schema.core :as s]))
@@ -9,6 +10,12 @@
   {(s/required-key "per_dem") s/Str
    (s/required-key "per_gop") s/Str
    (s/required-key "county_name") s/Str})
+
+(s/defschema HousingResult
+  {(s/required-key :address) s/Str
+   (s/required-key :num_bed) s/Str
+   (s/required-key :num_bath) s/Str
+   (s/required-key :square_ft) s/Str})
 
 
 (defapi service-routes
@@ -26,6 +33,15 @@
       :return [Result]
       :query-params [state :- s/Str]
       (-> (ok (data/query-data state))
+        (assoc-in [:headers "Access-Control-Allow-Origin"]  "*")
+        (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,PUT,POST,DELETE,OPTIONS")
+        (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))
+
+    (GET "/housing" []
+      :summary "Returns housing data for a given county and state"
+      :return [HousingResult]
+      :query-params [county :- s/Str state :- s/Str]
+      (-> (ok (scraper/run-scraper county state))
         (assoc-in [:headers "Access-Control-Allow-Origin"]  "*")
         (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,PUT,POST,DELETE,OPTIONS")
         (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))))

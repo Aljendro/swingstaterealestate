@@ -26,8 +26,11 @@
                  [ring/ring-core "1.6.0-RC3"]
                  [ring/ring-defaults "0.2.3"]
                  [selmer "1.10.7"]
-                 ;; Read csv files
-                 [cheshire "5.7.1"]]
+                 ;; Read json files
+                 [cheshire "5.7.1"]
+                 ;; Scrape html
+                 [enlive "1.1.6"]
+                 [http-kit "2.2.0"]]
 
   :min-lein-version "2.0.0"
 
