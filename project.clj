@@ -27,7 +27,7 @@
                  [ring/ring-defaults "0.2.3"]
                  [selmer "1.10.7"]
                  ;; Read csv files
-                 [org.clojure/data.csv "0.1.3"]]
+                 [cheshire "5.7.1"]]
 
   :min-lein-version "2.0.0"
 
