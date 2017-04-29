@@ -1,8 +1,7 @@
 # swingstaterealestate
 
-generated using Luminus version "2.9.11.46"
-
-FIXME
+Service project to expose election data via json api.
+Part of the DebugPoliticsLA Hackathon
 
 ## Prerequisites
 
@@ -18,4 +17,4 @@ To start a web server for the application, run:
 
 ## License
 
-Copyright © 2017 FIXME
+Copyright © 2017 Alejandro
