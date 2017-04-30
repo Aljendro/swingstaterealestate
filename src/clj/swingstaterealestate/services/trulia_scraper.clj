@@ -69,6 +69,28 @@
   [house-info]
   (map #(zipmap [:address :city :price :info] %) house-info))
 
+(defn expand-info
+  "Takes the info key values and splits them into their own entries"
+  [house-info]
+  (let [info-str (string/split (get house-info :info "n/a n/a n/a") #" ")]
+    (try
+      (into
+        (dissoc house-info :info)
+        {:bedrooms (nth info-str 0)
+         :baths (nth info-str 1)
+         :square_ft (nth info-str 2)})
+      (catch Exception e
+        (into
+          (dissoc house-info :info)
+          {:bedrooms "n/a"
+           :baths "n/a"
+           :square_ft "n/a"})))))
+
+(defn expand-all-info
+  "Map over all info and expand the info values"
+  [values]
+  (map expand-info values))
+
 (defn run-scraper
   "Runs the scraper for a given county and state"
   [county state]
@@ -78,4 +100,6 @@
         cities (get-city house-list)
         prices (get-price house-list)
         info (get-info house-list)]
-    (create-map-info (zip-all-info addresses cities prices info))))
+    (expand-all-info
+      (create-map-info
+        (zip-all-info addresses cities prices info)))))
