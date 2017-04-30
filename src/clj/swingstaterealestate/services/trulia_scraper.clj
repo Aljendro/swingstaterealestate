@@ -13,7 +13,7 @@
 (defn compose-url
   "Composes a url using a county and state"
   [county state]
-  (format trulia-website-url state (first (string/split county #" "))))
+  (format trulia-website-url state (string/replace county #" " "_")))
 
 (defn get-elems [page css]
   (.select page css))
