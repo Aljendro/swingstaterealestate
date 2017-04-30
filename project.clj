@@ -30,7 +30,8 @@
                  [cheshire "5.7.1"]
                  ;; Scrape html
                  [enlive "1.1.6"]
-                 [http-kit "2.2.0"]]
+                 [http-kit "2.2.0"]
+                 [org.clojars.clizzin/jsoup "1.5.1"]]
 
   :min-lein-version "2.0.0"
 
