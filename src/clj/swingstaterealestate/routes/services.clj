@@ -1,6 +1,6 @@
 (ns swingstaterealestate.routes.services
   (:require [swingstaterealestate.services.manipulate-data :as data]
-            [swingstaterealestate.services.trulia-scraper :as trulia-scraper]
+            [swingstaterealestate.services.trulia-scraper :as trulia]
             [ring.util.http-response :refer :all]
             [compojure.api.sweet :refer :all]
             [schema.core :as s]))
