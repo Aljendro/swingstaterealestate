@@ -13,7 +13,9 @@
 
 (s/defschema HousingResult
   {(s/required-key :address) s/Str
-   (s/required-key :city) s/Str})
+   (s/required-key :city) s/Str
+   (s/required-key :price) s/Str
+   (s/required-key :info) s/Str})
 
 (defapi service-routes
   {:swagger {:ui "/swagger-ui"

@@ -31,31 +31,43 @@
   (let [elements (get-elems page "ul.mvn.containerFluid > li")]
     (for [e elements] e)))
 
+(defn select-elements
+  "Select the elements with a specified css selector"
+  [snippet css]
+  (->> snippet
+    (map #(.select % css))
+    (filter #(not (empty? %)))
+    (map #(.text %))))
+
 (defn get-address
   "Get the address from the object"
   [snippet]
-  (->> snippet
-    (map #(.select % "span[itemprop$=streetAddress]"))
-    (filter #(not (empty? %)))
-    (map #(.text %))))
+  (select-elements snippet "span[itemprop$=streetAddress]"))
 
 (defn get-city
   "Get the address from the object"
   [snippet]
-  (->> snippet
-    (map #(.select % "span[itemprop$=addressLocality]"))
-    (filter #(not (empty? %)))
-    (map #(.text %))))
+  (select-elements snippet "span[itemprop$=addressLocality]"))
+
+(defn get-price
+  "Get the price from the object"
+  [snippet]
+  (select-elements snippet "span.cardPrice"))
+
+(defn get-info
+  "Get the info from the object"
+  [snippet]
+  (select-elements snippet "div.cardDetails ul"))
 
 (defn zip-all-info
   "Zips all the info into individual maps"
-  [address city]
-  (map #(vector %1 %2) address city))
+  [address city prices info]
+  (map #(vector %1 %2 %3 %4) address city prices info))
 
 (defn create-map-info
   "Zips the keywords for each column"
   [house-info]
-  (map #(zipmap [:address :city] %) house-info))
+  (map #(zipmap [:address :city :price :info] %) house-info))
 
 (defn run-scraper
   "Runs the scraper for a given county and state"
@@ -63,5 +75,7 @@
   (let [webpage (get-trulia-webpage county state)
         house-list (get-houses-list webpage)
         addresses (get-address house-list)
-        cities (get-city house-list)]
-    (create-map-info (zip-all-info addresses cities))))
+        cities (get-city house-list)
+        prices (get-price house-list)
+        info (get-info house-list)]
+    (create-map-info (zip-all-info addresses cities prices info))))
