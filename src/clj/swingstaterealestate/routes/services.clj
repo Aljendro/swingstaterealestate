@@ -17,7 +17,8 @@
    (s/required-key :price) s/Str
    (s/required-key :baths) s/Str
    (s/required-key :bedrooms) s/Str
-   (s/required-key :square_ft) s/Str})
+   (s/required-key :square_ft) s/Str
+   (s/required-key :rel_link) s/Str})
 
 (defapi service-routes
   {:swagger {:ui "/swagger-ui"

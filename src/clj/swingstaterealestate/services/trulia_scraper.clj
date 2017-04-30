@@ -59,15 +59,23 @@
   [snippet]
   (select-elements snippet "div.cardDetails ul"))
 
+(defn get-relative-info
+  "Gets the link from the link to the property to trulia"
+  [snippet]
+  (->> snippet
+    (map #(.select % "a"))
+    (map #(.attr % "href"))
+    (filter #(not (empty? %)))))
+
 (defn zip-all-info
   "Zips all the info into individual maps"
-  [address city prices info]
-  (map #(vector %1 %2 %3 %4) address city prices info))
+  [address city prices info links]
+  (map #(vector %1 %2 %3 %4 %5) address city prices info links))
 
 (defn create-map-info
   "Zips the keywords for each column"
   [house-info]
-  (map #(zipmap [:address :city :price :info] %) house-info))
+  (map #(zipmap [:address :city :price :info :rel_link] %) house-info))
 
 (defn expand-info
   "Takes the info key values and splits them into their own entries"
@@ -99,7 +107,8 @@
         addresses (get-address house-list)
         cities (get-city house-list)
         prices (get-price house-list)
-        info (get-info house-list)]
+        info (get-info house-list)
+        rel-info (get-relative-info house-list)]
     (expand-all-info
       (create-map-info
-        (zip-all-info addresses cities prices info)))))
+        (zip-all-info addresses cities prices info rel-info)))))
