@@ -34,16 +34,10 @@
       :summary "Returns county voting results for US 2016 election"
       :return [Result]
       :query-params [state :- s/Str]
-      (-> (ok (data/query-data state))
-        (assoc-in [:headers "Access-Control-Allow-Origin"]  "*")
-        (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,PUT,POST,DELETE,OPTIONS")
-        (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))
+      (ok (data/query-data state)))
 
     (GET "/housing" []
       :summary "Returns housing data for a given county and state"
       :return [HousingResult]
       :query-params [county :- s/Str state :- s/Str]
-      (-> (ok (trulia/run-scraper county state))
-        (assoc-in [:headers "Access-Control-Allow-Origin"]  "*")
-        (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,PUT,POST,DELETE,OPTIONS")
-        (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control")))))
+      (ok (trulia/run-scraper county state)))))
