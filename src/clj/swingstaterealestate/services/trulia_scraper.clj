@@ -35,7 +35,7 @@
   "Select the elements with a specified css selector"
   [snippet css]
   (->> snippet
-    (map #(.select % css))
+    (map #(get-elems % css))
     (filter #(not (empty? %)))
     (map #(.text %))))
 
@@ -63,7 +63,7 @@
   "Gets the link from the link to the property to trulia"
   [snippet]
   (->> snippet
-    (map #(.select % "a"))
+    (map #(get-elems % "a"))
     (map #(.attr % "href"))
     (filter #(not (empty? %)))))
 
