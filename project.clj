@@ -31,12 +31,14 @@
                  ;; Scrape html
                  [enlive "1.1.6"]
                  [http-kit "2.2.0"]
-                 [org.clojars.clizzin/jsoup "1.5.1"]]
+                 [org.clojars.clizzin/jsoup "1.5.1"]
+                 [org.clojure/spec.alpha "0.1.94"]]
+
 
   :min-lein-version "2.0.0"
 
   :jvm-opts ["-server" "-Dconf=.lein-env"]
-  :source-paths ["src/clj"]
+  :source-paths ["src/clj" "src/spec"]
   :test-paths ["test/clj"]
   :resource-paths ["resources"]
   :target-path "target/%s/"
