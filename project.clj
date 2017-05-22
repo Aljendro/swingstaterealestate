@@ -14,7 +14,7 @@
                  [metosin/muuntaja "0.2.1"]
                  [metosin/ring-http-response "0.8.2"]
                  [mount "0.1.11"]
-                 [org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojure "1.9.0-alpha16"]
                  [org.clojure/tools.cli "0.3.5"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.webjars.bower/tether "1.4.0"]
@@ -32,8 +32,10 @@
                  [enlive "1.1.6"]
                  [http-kit "2.2.0"]
                  [org.clojars.clizzin/jsoup "1.5.1"]
-                 [org.clojure/spec.alpha "0.1.94"]]
+                 [org.clojure/spec.alpha "0.1.94"]
+                 [org.clojure/test.check "0.9.0"]]
 
+  
 
   :min-lein-version "2.0.0"
 
