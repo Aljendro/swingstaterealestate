@@ -31,7 +31,7 @@
                  ;; Scrape html
                  [enlive "1.1.6"]
                  [http-kit "2.2.0"]
-                 [org.clojars.clizzin/jsoup "1.5.1"]
+                 [org.jsoup/jsoup "1.10.2"]
                  [org.clojure/spec.alpha "0.1.94"]
                  [org.clojure/test.check "0.9.0"]]
 
