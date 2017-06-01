@@ -3,17 +3,22 @@
             [org.httpkit.client :as http]
             [clojure.string :as string]
             [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gs]
-            [clojure.spec.test.alpha :as ts])
-  (:import (java.net URL)
-           (org.jsoup Jsoup)
+            [swingstaterealestate.generators.trulia-scraper :as trulia.gen])
+  (:import (org.jsoup Jsoup)
            (org.jsoup.select Elements)
            (org.jsoup.nodes Element)))
+
+
+
+
 
 ;; Practicing using clojure.spec, the composeable specification library
 ;; Hopefully in the future we are able to statically analyze the specs
 ;; and use them as type hints to the compiler for more efficient code
 ;; generation.
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;; specifications ;;;;;;;;;;;;;;;;;;;;;
@@ -24,7 +29,7 @@
   (fn [object] (instance? class-name object)))
 
 ;; Cascade style sheet selectors are just strings
-(s/def ::css string?)
+(s/def ::css (s/and string? #(not (empty? %))))
 ;; Building up the structure of a house
 (s/def ::address string?)
 (s/def ::city string?)
@@ -36,9 +41,27 @@
 (s/def ::square_ft string?)
 (s/def ::info string?)
 
-(s/def ::house (s/keys :req [::address ::city ::price ::rel_link]))
-(s/def ::house-info (s/merge ::house (s/keys :req [::info])))
-(s/def ::house-expand-info (s/merge ::house (s/keys :req [::bedrooms ::baths ::square_ft])))
+(s/def ::house (s/keys :req-un [::address
+                                ::city
+                                ::price
+                                ::rel_link]))
+
+(s/def ::house-info (s/merge ::house (s/keys :req-un [::info])))
+
+(s/def ::house-expand-info (s/merge ::house (s/keys :req-un [::bedrooms
+                                                             ::baths
+                                                             ::square_ft])))
+
+;; Create Element spec and add a generator
+(s/def ::element (s/with-gen
+                   (java-spec Element)
+                   trulia.gen/element-generator))
+
+;; Create counties and states
+(s/def ::county (s/with-gen string?
+                  trulia.gen/county-generator))
+(s/def ::state (s/with-gen string?
+                 trulia.gen/state-generator))
 
 ;; A macro that writes specs for me!
 ;; Can we use a function here?
@@ -48,22 +71,25 @@
   as strings"
   [fn-name]
   `(s/fdef ~fn-name
-           :args (s/* (java-spec Element))
-           :ret (s/* string?)))
+           :args (s/cat :elements (s/coll-of ::element))
+           :ret (s/coll-of string?)))
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; implementations ;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def trulia-website-url
-  "http://www.trulia.com/County/%s/%s_Real_Estate/")
+   "http://www.trulia.com/County/%s/%s_Real_Estate/")
 
 
 ;; We can further spec what it means to be a county
 ;; and what is means to be a state, but here we just
 ;; make it simple and accept a string...
 (s/fdef compose-url
-        :args (s/cat :county string? :state string?)
+        :args (s/cat :county ::county :state ::state)
         :ret string?)
 (defn compose-url
   "Composes a url using a county and state"
@@ -72,7 +98,7 @@
 
 
 (s/fdef get-elems
-        :args (s/cat :page (java-spec Element) :css ::css)
+        :args (s/cat :page ::element :css ::css)
         :ret (java-spec Elements))
 (defn get-elems
   "Gets all elements that are selected by the css string"
@@ -81,8 +107,8 @@
 
 
 (s/fdef get-trulia-webpage
-        :args (s/cat :county string? :state string?)
-        :ret (java-spec Element))
+        :args (s/cat :county ::county :state ::state)
+        :ret ::element)
 (defn get-trulia-webpage
   "Use a county name and state to get an html page"
   [county-name state]
@@ -91,8 +117,8 @@
 
 
 (s/fdef get-houses-list
-        :args (s/cat :page (java-spec Element))
-        :ret (s/* (java-spec Element)))
+        :args (s/cat :page ::element)
+        :ret (s/coll-of ::element))
 (defn get-houses-list
   "Using the dom object, return the html
   that contains the house information"
@@ -102,8 +128,8 @@
 
 
 (s/fdef select-elements
-        :args (s/cat :element (java-spec Element) :css string?)
-        :ret (s/* string?))
+        :args (s/cat :element (s/coll-of ::element) :css ::css)
+        :ret (s/coll-of string?))
 (defn select-elements
   "Select the elements with a specified css selector"
   [snippet css]
@@ -154,8 +180,12 @@
 
 
 (s/fdef zip-all-info
-        :args (s/* (s/* string?))
-        :ret (s/* (s/* string?)))
+        :args (s/cat :address (s/coll-of ::address)
+                     :city (s/coll-of ::city)
+                     :prices (s/coll-of ::price)
+                     :info (s/coll-of ::info)
+                     :link (s/coll-of ::rel_link))
+        :ret (s/coll-of (s/coll-of string?)))
 (defn zip-all-info
   "Zips all the info into individual maps"
   [address city prices info links]
@@ -163,8 +193,8 @@
 
 
 (s/fdef create-map-info
-        :args (s/* sequential?)
-        :ret (s/* ::house-info))
+        :args (s/cat :house-info (s/coll-of (s/coll-of string? :count 5)))
+        :ret (s/coll-of ::house-info))
 (defn create-map-info
   "Zips the keywords for each column"
   [house-info]
@@ -193,8 +223,8 @@
 
 
 (s/fdef expand-all-info
-        :args (s/cat :houses (s/* ::house-info))
-        :ret (s/* ::house-expand-info))
+        :args (s/cat :houses (s/coll-of ::house-info))
+        :ret (s/coll-of ::house-expand-info))
 (defn expand-all-info
   "Map over all info and expand the info values"
   [values]
@@ -202,8 +232,8 @@
 
 
 (s/fdef run-scraper
-        :args (s/cat :county string? :state string?)
-        :ret (s/* ::house-expand-info))
+        :args (s/cat :county ::county :state ::state)
+        :ret (s/coll-of ::house-expand-info))
 (defn run-scraper
   "Runs the scraper for a given county and state"
   [county state]
